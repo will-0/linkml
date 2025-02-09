@@ -18,6 +18,7 @@ from linkml_runtime.utils.namespaces import Namespaces
 from linkml_runtime.utils.yamlutils import extended_str
 from rdflib import URIRef
 from pathlib import Path
+import os
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -268,12 +269,12 @@ def resolve_merged_imports(
             continue
 
         # Adjust relative imports to be relative to the importing file
-        elif imported_from.startswith("./"):
+        elif imp.startswith("."):
             if imported_from is None:
                 Warning(f"Cannot resolve relative import: {imp}")
                 target.imports.append(imp)
             else:
-                resolved_imp = f"./{str((Path(imported_from).parent / Path(imp)).as_posix())}"
+                resolved_imp = os.path.normpath(str(Path(imported_from).parent / Path(imp)))
                 target.imports.append(resolved_imp)
 
         else:
