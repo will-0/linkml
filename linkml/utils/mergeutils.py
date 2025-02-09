@@ -17,6 +17,8 @@ from linkml_runtime.utils.formatutils import camelcase, underscore
 from linkml_runtime.utils.namespaces import Namespaces
 from linkml_runtime.utils.yamlutils import extended_str
 from rdflib import URIRef
+from pathlib import Path
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +35,7 @@ def merge_schemas(
     if target.license is None:
         target.license = mergee.license
 
-    target.imports += [imp for imp in mergee.imports if imp not in target.imports]
+    resolve_merged_imports(target, mergee, imported_from)
     set_from_schema(mergee)
 
     if namespaces:
@@ -232,3 +234,49 @@ def merge_enums(
     """
     # TODO: Finish enumeration merge code
     pass
+
+
+def resolve_merged_imports(
+    target: SchemaDefinition,
+    mergee: SchemaDefinition,
+    imported_from: Optional[str] = None
+) -> None:
+    """Merge the imports in source into target
+
+    :param target: Containing schema
+    :param mergee: mergee
+    :param imported_from: file that the mergee was imported from
+    :param at_end: True means add mergee to the end.  False to the front
+    """
+
+    for imp in mergee.imports:
+        if imp is None:
+            continue
+
+        # Skip if already imported
+        if imp in target.imports:
+            continue
+
+        # Leave as-is if the import has a scheme (e.g. http://)
+        elif urlparse(imp).scheme:
+            target.imports.append(imp)
+            continue
+
+        # Leave as-is if the import is an absolute path
+        elif Path(imp).is_absolute():
+            target.imports.append(imp)
+            continue
+
+        # Adjust relative imports to be relative to the importing file
+        elif imported_from.startswith("./"):
+            if imported_from is None:
+                Warning(f"Cannot resolve relative import: {imp}")
+                target.imports.append(imp)
+            else:
+                resolved_imp = f"./{str((Path(imported_from).parent / Path(imp)).as_posix())}"
+                target.imports.append(resolved_imp)
+
+        else:
+            raise ValueError(f"Cannot determine how to handle import: {imp}")
+
+        
