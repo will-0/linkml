@@ -1793,7 +1793,7 @@ name = "linkml-runtime"
 version = "1.9.0"
 description = "Runtime environment for LinkML, the Linked open data modeling language"
 optional = false
-python-versions = "<4.0,>=3.8"
+python-versions = "<4.0.0,>=3.8.1"
 groups = ["main"]
 files = [
     {file = "linkml_runtime-1.9.0-py3-none-any.whl", hash = "sha256:6c8f95e56f856a0f74c7567eddbb22090acceadcadbd0bfbd9739fcd04309705"},
@@ -1805,6 +1805,7 @@ click = "*"
 curies = ">=0.5.4"
 deprecated = "*"
 hbreader = "*"
+isodate = ">=0.7.2,<0.8.0"
 json-flattener = ">=0.1.9"
 jsonasobj2 = ">=1.0.4,<2.dev0"
 jsonschema = ">=3.2.0"
@@ -4697,4 +4698,4 @@ tests = ["black", "numpydantic", "pyshacl"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.8.1"
-content-hash = "bdfa5935032184a3743738cc6574b406c29e77794b115cb597566f2974b1e87e"
+content-hash = "47b4f4f011c863a11fae78d1785d860dbf9df88f9635f6e72181be179656ad75"
